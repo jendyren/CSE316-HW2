@@ -19,13 +19,24 @@ body {
 
 #root {
   background-color: var(--swatch-primary);
-  font-family: serif;
+  font-family: 'Tangerine', serif;
   position: absolute;
   width: 80%;
   left: 10%;
   height:90%;
   top: 5%;
   display:grid;
+  grid-template-columns: 30% 70%;
+  grid-template-rows: 10% 10% 70% 10%;
+}
+
+#root-inner{
+  background-color: var(--swatch-primary);
+  font-family: 'Tangerine', serif;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: grid;
   grid-template-columns: 30% 70%;
   grid-template-rows: 10% 10% 70% 10%;
 }
@@ -109,7 +120,7 @@ body {
 }
 
 .list-card, .selected-list-card, .unselected-list-card {
-  font-size: 18pt;
+  font-size: 2.5em;
   margin: 10px;
   padding: 20px;
   border-radius: 25px;
@@ -132,7 +143,7 @@ body {
 
 .list-card-button {
   float:right;
-  font-size:18pt;
+  font-size: 24pt;
 }
 
 .playlister-button, .playlister-button-disabled {
@@ -154,14 +165,23 @@ body {
 }
 
 .playlister-song, .playlister-song-dragged-to { 
-  display:flex;
+  display: flex;
   align-items: center;
-  font-size: 24pt;
-  height:20%;
+  font-size: 2.5em;
+  background-color: var(--swatch-foundation);
+  margin: 10px 10px 5px 10px;
+  padding: 2%;
+  border-radius: 25px;
 }
 
+.playlister-song:hover, .playlister-song-dragged-to:hover{
+  background-color: var(--swatch-contrast);
+  color: white;
+}
+
+
 input {
-  font-size:20pt;
+  font-size:36pt;
 }
 
 
@@ -220,7 +240,7 @@ input {
   grid-template-columns: 30% 65%;
   grid-template-rows: 33% 33% 33%;
   gap: 10px 20px;
-  font-size: 48pt;
+  font-size: 36pt;
 }
 
 span {
@@ -394,4 +414,17 @@ span {
   100% {
     transform: rotate(0deg);
   }
+}
+
+.delete-song-button{
+  font-size: 24px;
+  margin-left: auto;
+}
+
+.song-details{
+  width: 90%;
+}
+
+.toolbar-button{
+  box-shadow: 2px 4px #888888;
 }
