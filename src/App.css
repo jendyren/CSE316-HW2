@@ -428,3 +428,7 @@ span {
 .toolbar-button{
   box-shadow: 2px 4px #888888;
 }
+
+.playlister-song a{
+  margin-left: 5px;
+}
