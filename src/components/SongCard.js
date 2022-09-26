@@ -67,6 +67,19 @@ export default class SongCard extends React.Component {
         this.props.removeSongCallback(songKeyPair);
     }
 
+    handleEditSong = (event) =>{
+        if (event.detail === 2) {
+            event.stopPropagation();
+            let songKeyPair = {
+                key: this.getItemNum()-1, 
+                song: this.props.song};
+            console.log("inside handleEditSong: ");
+            console.log(songKeyPair);
+            console.log('double click');
+            this.props.editSongCallback(songKeyPair);
+        }
+    }
+
     render() {
         const { song } = this.props;
 
@@ -86,6 +99,7 @@ export default class SongCard extends React.Component {
                 onDragLeave={this.handleDragLeave}
                 onDrop={this.handleDrop}
                 draggable="true"
+                onClick={this.handleEditSong}
             >
                 
                 {num}.

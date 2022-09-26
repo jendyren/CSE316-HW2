@@ -432,3 +432,19 @@ span {
 .playlister-song a{
   margin-left: 5px;
 }
+
+.modal-center-content input{
+  font-size: 15px;
+}
+
+#edit-song-title{
+  margin-left: 6.8em;
+}
+
+#edit-song-artist{
+  margin-left: 4.8em;
+}
+
+#edit-song-youtubeId{
+  margin-left: 1.3em;
+}
