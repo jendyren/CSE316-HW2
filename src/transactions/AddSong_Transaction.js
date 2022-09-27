@@ -9,19 +9,16 @@ import jsTPS_Transaction from "../common/jsTPS.js"
  * @author ?
  */
 export default class AddSong_Transaction extends jsTPS_Transaction {
-    constructor(initApp, index) {
+    constructor(initApp) {
         super();
         this.app = initApp;
-        this.index = index;
     }
 
     doTransaction() {
-        console.log("Inside doTransaction: ");
-        console.log(this.index);
-        this.app.addNewSong(this.index);
+        this.app.addNewSong();
     }
     
     undoTransaction() {
-        this.app.removeLastSong(this.index);
+        this.app.removeLastSong();
     }
 }

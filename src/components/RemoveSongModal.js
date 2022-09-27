@@ -1,13 +1,17 @@
 import React, { Component } from 'react';
 
 export default class RemoveSongModal extends Component {
+    handleRemoveSong = () => {
+        console.log(this.props.songKeyPair);
+        this.props.removeSongCallback(this.props.songKeyPair);
+    }
+
     render() {
-        const { songKeyPair, removeSongCallback, hideRemoveSongModalCallback } = this.props;
+        const { songKeyPair, hideRemoveSongModalCallback } = this.props;
         let name = "";
 
         if(songKeyPair){
             name = songKeyPair.song.title;
-            console.log(name)
         }
         
         return (
@@ -28,7 +32,7 @@ export default class RemoveSongModal extends Component {
                             <input type="button" 
                                 id="remove-song-confirm-button" 
                                 className="modal-button" 
-                                onClick={removeSongCallback}
+                                onClick={this.handleRemoveSong}
                                 value='Confirm' />
                             <input type="button" 
                                 id="remove-song-cancel-button" 

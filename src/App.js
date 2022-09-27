@@ -8,6 +8,7 @@ import jsTPS from './common/jsTPS.js';
 // OUR TRANSACTIONS
 import MoveSong_Transaction from './transactions/MoveSong_Transaction.js';
 import AddSong_Transaction from './transactions/AddSong_Transaction';
+import RemoveSong_Transaction from './transactions/RemoveSong_Transaction';
 
 // THESE REACT COMPONENTS ARE MODALS
 import DeleteListModal from './components/DeleteListModal.js';
@@ -155,17 +156,34 @@ class App extends React.Component {
         this.hideDeleteListModal();
     }
 
-    removeSong = (key) => {
+    removeSong = (keyPair) => {     
+        console.log("4: removeSong...");   
         let list = this.state.currentList;
-        list.songs.splice(key, 1);
-        console.log(list);
+        list.songs.splice(keyPair.key, 1);
+
         this.hideRemoveSongModal();
         this.setStateWithUpdatedList(list);
     }
 
-    removeMarkedSong = () => {
-        this.removeSong(this.state.songKeyPairMarkedForRemoval.key);
+    removeMarkedSong = (songKeyPair) => {
+        console.log("3: removeMarkedSong...");
+        console.log("keyPair in removeSongSong");
+        console.log(songKeyPair);
+        this.removeSong(songKeyPair);
         this.hideRemoveSongModal();
+    }
+
+    addPreviousSong = (keyPair) => {
+        let list = this.state.currentList;
+        list.songs.splice(keyPair.key, 0, keyPair.song);
+        this.setStateWithUpdatedList(list);
+    }
+
+    addMarkedSong = (songKeyPair) => {
+        console.log("keyPair in addMarkedSong");
+        console.log(songKeyPair);
+        this.addPreviousSong(songKeyPair);
+        
     }
 
     editSong = (keyPair) => {
@@ -305,10 +323,14 @@ class App extends React.Component {
     }
 
     // THIS FUNCTION ADDS A AddSong_Transaction TO THE TRANSACTION STACK
-    addAddSongTransaction = (index) => {
-        console.log("Index passed in for addSong: " + index);
-        console.log(index);
-        let transaction = new AddSong_Transaction(this, index);
+    addAddSongTransaction = () => {
+        let transaction = new AddSong_Transaction(this);
+        this.tps.addTransaction(transaction);
+    }
+
+    // THIS FUNCTION ADDS A AddSong_Transaction TO THE TRANSACTION STACK
+    addRemoveSongTransaction = (songKeyPair) => {
+        let transaction = new RemoveSong_Transaction(this, songKeyPair);
         this.tps.addTransaction(transaction);
     }
 
@@ -358,6 +380,8 @@ class App extends React.Component {
             songKeyPairMarkedForRemoval : keyPair,
         }), () => {
             // PROMPT THE USER
+            console.log("2: Opening remove Song Modal...")
+            let showModal = true;
             this.showRemoveSongModal();
         });
     }
@@ -438,7 +462,7 @@ class App extends React.Component {
                 />
                 <RemoveSongModal
                     songKeyPair={this.state.songKeyPairMarkedForRemoval}
-                    removeSongCallback={this.removeMarkedSong}
+                    removeSongCallback={this.addRemoveSongTransaction}
                     hideRemoveSongModalCallback={this.hideRemoveSongModal}
                 />
                 <EditSongModal
