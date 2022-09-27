@@ -59,11 +59,20 @@ export default class SongCard extends React.Component {
     }
 
     handleRemoveSong = (event) => {
+        console.log("1: handleRemoveSong...")
         event.stopPropagation();
         let songKeyPair = {
             key: this.getItemNum()-1, 
             song: this.props.song};
+        console.log("****")
         console.log(songKeyPair);
+        //key:
+        //song{
+            //title
+            //artist
+            //youtube
+        //}
+        console.log("****")
         this.props.removeSongCallback(songKeyPair);
     }
 

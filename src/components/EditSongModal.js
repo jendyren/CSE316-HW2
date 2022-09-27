@@ -3,7 +3,6 @@ import React, { Component } from 'react';
 export default class EditSongModal extends Component {
     render() {
         const { songKeyPair, editSongCallback, hideEditSongModalCallback } = this.props;
-        let name, artist, youTubeId = "";
 
         if(songKeyPair){
             document.getElementById("edit-song-title").value = songKeyPair.song.title;

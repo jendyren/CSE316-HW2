@@ -7,6 +7,8 @@ import jsTPS from './common/jsTPS.js';
 
 // OUR TRANSACTIONS
 import MoveSong_Transaction from './transactions/MoveSong_Transaction.js';
+import AddSong_Transaction from './transactions/AddSong_Transaction';
+import RemoveSong_Transaction from './transactions/RemoveSong_Transaction';
 
 // THESE REACT COMPONENTS ARE MODALS
 import DeleteListModal from './components/DeleteListModal.js';
@@ -48,9 +50,8 @@ class App extends React.Component {
             return keyPair1.name.localeCompare(keyPair2.name);
         });
     }
+
     addNewSong = () => {
-        // console.log(this.state.sessionData);
-        // console.log(this.state.currentList);
         let tempArray = this.state.currentList;
         let lastElementIndex = this.getPlaylistSize();
         let newSong = {
@@ -59,10 +60,18 @@ class App extends React.Component {
             youTubeId : "dQw4w9WgXcQ"
         }
         tempArray.songs.splice(lastElementIndex, 0, newSong);
-        // console.log(tempArray.songs);
         this.setStateWithUpdatedList(tempArray);
-        // console.log(this.state.currentList);
     }
+
+    removeLastSong = () => {
+        console.log("inside remove last song...");
+        let tempArray = this.state.currentList;
+        let lastElementIndex = this.getPlaylistSize();
+        console.log(lastElementIndex);
+        tempArray.songs.splice(lastElementIndex-1, 1);
+        this.setStateWithUpdatedList(tempArray);
+    }
+
     // THIS FUNCTION BEGINS THE PROCESS OF CREATING A NEW LIST
     createNewList = () => {
         // FIRST FIGURE OUT WHAT THE NEW LIST'S KEY AND NAME WILL BE
@@ -147,17 +156,34 @@ class App extends React.Component {
         this.hideDeleteListModal();
     }
 
-    removeSong = (key) => {
+    removeSong = (keyPair) => {     
+        console.log("4: removeSong...");   
         let list = this.state.currentList;
-        list.songs.splice(key, 1);
-        console.log(list);
+        list.songs.splice(keyPair.key, 1);
+
         this.hideRemoveSongModal();
         this.setStateWithUpdatedList(list);
     }
 
-    removeMarkedSong = () => {
-        this.removeSong(this.state.songKeyPairMarkedForRemoval.key);
+    removeMarkedSong = (songKeyPair) => {
+        console.log("3: removeMarkedSong...");
+        console.log("keyPair in removeSongSong");
+        console.log(songKeyPair);
+        this.removeSong(songKeyPair);
         this.hideRemoveSongModal();
+    }
+
+    addPreviousSong = (keyPair) => {
+        let list = this.state.currentList;
+        list.songs.splice(keyPair.key, 0, keyPair.song);
+        this.setStateWithUpdatedList(list);
+    }
+
+    addMarkedSong = (songKeyPair) => {
+        console.log("keyPair in addMarkedSong");
+        console.log(songKeyPair);
+        this.addPreviousSong(songKeyPair);
+        
     }
 
     editSong = (keyPair) => {
@@ -174,9 +200,6 @@ class App extends React.Component {
             youTubeId : editedSongYoutubeId
         }
 
-        // console.log(editedSongDetails)
-        // console.log("Inside editSong(key) function...");
-        // console.log(keyPair.key);
         console.log(keyPair.song);
 
         list.songs.splice(keyPair.key, 1, editedSongDetails);
@@ -298,6 +321,19 @@ class App extends React.Component {
         let transaction = new MoveSong_Transaction(this, start, end);
         this.tps.addTransaction(transaction);
     }
+
+    // THIS FUNCTION ADDS A AddSong_Transaction TO THE TRANSACTION STACK
+    addAddSongTransaction = () => {
+        let transaction = new AddSong_Transaction(this);
+        this.tps.addTransaction(transaction);
+    }
+
+    // THIS FUNCTION ADDS A AddSong_Transaction TO THE TRANSACTION STACK
+    addRemoveSongTransaction = (songKeyPair) => {
+        let transaction = new RemoveSong_Transaction(this, songKeyPair);
+        this.tps.addTransaction(transaction);
+    }
+
     // THIS FUNCTION BEGINS THE PROCESS OF PERFORMING AN UNDO
     undo = () => {
         if (this.tps.hasTransactionToUndo()) {
@@ -344,6 +380,8 @@ class App extends React.Component {
             songKeyPairMarkedForRemoval : keyPair,
         }), () => {
             // PROMPT THE USER
+            console.log("2: Opening remove Song Modal...")
+            let showModal = true;
             this.showRemoveSongModal();
         });
     }
@@ -405,7 +443,7 @@ class App extends React.Component {
                     canUndo={canUndo}
                     canRedo={canRedo}
                     canClose={canClose} 
-                    addSongCallback={this.addNewSong}
+                    addSongCallback={this.addAddSongTransaction}
                     undoCallback={this.undo}
                     redoCallback={this.redo}
                     closeCallback={this.closeCurrentList}
@@ -424,7 +462,7 @@ class App extends React.Component {
                 />
                 <RemoveSongModal
                     songKeyPair={this.state.songKeyPairMarkedForRemoval}
-                    removeSongCallback={this.removeMarkedSong}
+                    removeSongCallback={this.addRemoveSongTransaction}
                     hideRemoveSongModalCallback={this.hideRemoveSongModal}
                 />
                 <EditSongModal
