@@ -9,6 +9,7 @@ import jsTPS from './common/jsTPS.js';
 import MoveSong_Transaction from './transactions/MoveSong_Transaction.js';
 import AddSong_Transaction from './transactions/AddSong_Transaction';
 import RemoveSong_Transaction from './transactions/RemoveSong_Transaction';
+import EditSong_Transaction from './transactions/EditSong_Transaction';
 
 // THESE REACT COMPONENTS ARE MODALS
 import DeleteListModal from './components/DeleteListModal.js';
@@ -186,13 +187,12 @@ class App extends React.Component {
         
     }
 
-    editSong = (keyPair) => {
+    editSong = (oldSongKeyPair, newSongKeyPair) => {
         let list = this.state.currentList;
 
-        console.log(list);
-        let editedSongName = document.getElementById("edit-song-title").value;
-        let editedSongArtist = document.getElementById("edit-song-artist").value;
-        let editedSongYoutubeId = document.getElementById("edit-song-youtubeId").value;
+        let editedSongName = newSongKeyPair.song.title;
+        let editedSongArtist = newSongKeyPair.song.artist;
+        let editedSongYoutubeId = newSongKeyPair.song.youTubeId;
 
         let editedSongDetails = {
             title : editedSongName,
@@ -200,17 +200,20 @@ class App extends React.Component {
             youTubeId : editedSongYoutubeId
         }
 
-        console.log(keyPair.song);
+        console.log("******");
+        console.log(editedSongDetails);
+        console.log("******");
 
-        list.songs.splice(keyPair.key, 1, editedSongDetails);
+        list.songs.splice(oldSongKeyPair.key, 1, editedSongDetails);
+        console.log("List after splicing edit song: ");
         console.log(list);
         this.hideEditSongModal();
         this.setStateWithUpdatedList(list);
     }
 
-    editMarkedSong = () => {
-        this.editSong(this.state.songKeyPairMarkedForRemoval);
-        this.hideEditSongModal();
+    editMarkedSong = (oldSongKeyPair, newSongKeyPair) => {
+        this.editSong(oldSongKeyPair, newSongKeyPair);
+        // this.hideEditSongModal();
     }
 
     // THIS FUNCTION SPECIFICALLY DELETES THE CURRENT LIST
@@ -328,9 +331,15 @@ class App extends React.Component {
         this.tps.addTransaction(transaction);
     }
 
-    // THIS FUNCTION ADDS A AddSong_Transaction TO THE TRANSACTION STACK
+    // THIS FUNCTION ADDS A RemoveSong_Transaction TO THE TRANSACTION STACK
     addRemoveSongTransaction = (songKeyPair) => {
         let transaction = new RemoveSong_Transaction(this, songKeyPair);
+        this.tps.addTransaction(transaction);
+    }
+
+    // THIS FUNCTION ADDS A EditSong_Transaction TO THE TRANSACTION STACK
+    addEditSongTransaction = (songKeyPair, newSongKeyPair) => {
+        let transaction = new EditSong_Transaction(this, songKeyPair, newSongKeyPair);
         this.tps.addTransaction(transaction);
     }
 
@@ -381,7 +390,6 @@ class App extends React.Component {
         }), () => {
             // PROMPT THE USER
             console.log("2: Opening remove Song Modal...")
-            let showModal = true;
             this.showRemoveSongModal();
         });
     }
@@ -467,7 +475,7 @@ class App extends React.Component {
                 />
                 <EditSongModal
                     songKeyPair={this.state.songKeyPairMarkedForRemoval}
-                    editSongCallback={this.editMarkedSong}
+                    editSongCallback={this.addEditSongTransaction}
                     hideEditSongModalCallback={this.hideEditSongModal}
                 />
             </div>

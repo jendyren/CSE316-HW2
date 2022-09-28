@@ -1,8 +1,21 @@
 import React, { Component } from 'react';
 
 export default class EditSongModal extends Component {
+    handleEditSong = () =>{
+        let songDetails = {
+            title : document.getElementById("edit-song-title").value,
+            artist : document.getElementById("edit-song-artist").value,
+            youTubeId : document.getElementById("edit-song-youtubeId").value};
+
+        let newSongKeyPair = {
+            key : this.props.songKeyPair.key,
+            song : songDetails
+        }
+        this.props.editSongCallback(this.props.songKeyPair, newSongKeyPair);
+    }
+
     render() {
-        const { songKeyPair, editSongCallback, hideEditSongModalCallback } = this.props;
+        const { songKeyPair, hideEditSongModalCallback } = this.props;
 
         if(songKeyPair){
             document.getElementById("edit-song-title").value = songKeyPair.song.title;
@@ -30,7 +43,7 @@ export default class EditSongModal extends Component {
                             <input type="button" 
                                 id="edit-song-confirm-button" 
                                 className="modal-button" 
-                                onClick={editSongCallback}
+                                onClick={this.handleEditSong}
                                 value='Confirm' />
                             <input type="button" 
                                 id="edit-song-cancel-button" 

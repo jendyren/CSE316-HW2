@@ -1,6 +1,6 @@
 import jsTPS_Transaction from "../common/jsTPS.js"
 /**
- * MoveSong_Transaction
+ * RemoveSong_Transaction
  * 
  * This class represents a transaction that works with drag
  * and drop. It will be managed by the transaction stack.
@@ -17,14 +17,14 @@ export default class RemoveSong_Transaction extends jsTPS_Transaction {
     }
 
     doTransaction() {
-        console.log("--- start doTransaction ---");
+        // console.log("--- start doTransaction ---");
         this.app.removeMarkedSong(this.songKeyPair);
-        console.log("--- end doTransaction ---");
+        // console.log("--- end doTransaction ---");
     }
     
     undoTransaction() {
-        console.log("--- start undoTransaction ---");
+        // console.log("--- start undoTransaction ---");
         this.app.addMarkedSong(this.songKeyPair);
-        console.log("--- end undoTransaction ---");
+        // console.log("--- end undoTransaction ---");
     }
 }

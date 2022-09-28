@@ -1,6 +1,6 @@
 import jsTPS_Transaction from "../common/jsTPS.js"
 /**
- * MoveSong_Transaction
+ * AddSong_Transaction
  * 
  * This class represents a transaction that works with drag
  * and drop. It will be managed by the transaction stack.
