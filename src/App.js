@@ -39,6 +39,7 @@ class App extends React.Component {
 
         // SETUP THE INITIAL STATE
         this.state = {
+            modalOpen: false,
             songKeyPairMarkedForRemoval : null,
             listKeyPairMarkedForDeletion : null,
             currentList : null,
@@ -53,24 +54,26 @@ class App extends React.Component {
     }
 
     addNewSong = () => {
-        let tempArray = this.state.currentList;
-        let lastElementIndex = this.getPlaylistSize();
-        let newSong = {
-            title : "Untitled",
-            artist : "Unknown",
-            youTubeId : "dQw4w9WgXcQ"
+        if(this.state.currentList){
+            let lastElementIndex = this.getPlaylistSize();
+            let newSong = {
+                title : "Untitled",
+                artist : "Unknown",
+                youTubeId : "dQw4w9WgXcQ"
+            }
+            this.state.currentList.songs.splice(lastElementIndex, 0, newSong);
+            this.setStateWithUpdatedList(this.state.currentList);
         }
-        tempArray.songs.splice(lastElementIndex, 0, newSong);
-        this.setStateWithUpdatedList(tempArray);
+
     }
 
     removeLastSong = () => {
-        console.log("inside remove last song...");
-        let tempArray = this.state.currentList;
-        let lastElementIndex = this.getPlaylistSize();
-        console.log(lastElementIndex);
-        tempArray.songs.splice(lastElementIndex-1, 1);
-        this.setStateWithUpdatedList(tempArray);
+        if(this.state.currentList){
+            let lastElementIndex = this.getPlaylistSize();
+            console.log(lastElementIndex);
+            this.state.currentList.songs.splice(lastElementIndex-1, 1);
+            this.setStateWithUpdatedList(this.state.currentList);
+        }
     }
 
     // THIS FUNCTION BEGINS THE PROCESS OF CREATING A NEW LIST
@@ -155,6 +158,7 @@ class App extends React.Component {
     deleteMarkedList = () => {
         this.deleteList(this.state.listKeyPairMarkedForDeletion.key);
         this.hideDeleteListModal();
+
     }
 
     removeSong = (keyPair) => {     
@@ -171,13 +175,14 @@ class App extends React.Component {
         console.log("keyPair in removeSongSong");
         console.log(songKeyPair);
         this.removeSong(songKeyPair);
-        this.hideRemoveSongModal();
     }
 
     addPreviousSong = (keyPair) => {
-        let list = this.state.currentList;
-        list.songs.splice(keyPair.key, 0, keyPair.song);
-        this.setStateWithUpdatedList(list);
+        if(this.state.currentList){
+            let list = this.state.currentList;
+            list.songs.splice(keyPair.key, 0, keyPair.song);
+            this.setStateWithUpdatedList(list);
+        }
     }
 
     addMarkedSong = (songKeyPair) => {
@@ -207,8 +212,9 @@ class App extends React.Component {
         list.songs.splice(oldSongKeyPair.key, 1, editedSongDetails);
         console.log("List after splicing edit song: ");
         console.log(list);
+
         this.hideEditSongModal();
-        this.setStateWithUpdatedList(list);
+        this.setStateWithUpdatedList(list);        
     }
 
     editMarkedSong = (oldSongKeyPair, newSongKeyPair) => {
@@ -271,6 +277,7 @@ class App extends React.Component {
     }
     // THIS FUNCTION BEGINS THE PROCESS OF CLOSING THE CURRENT LIST
     closeCurrentList = () => {
+        this.tps.clearAllTransactions();
         this.setState(prevState => ({
             listKeyPairMarkedForDeletion : prevState.listKeyPairMarkedForDeletion,
             currentList: null,
@@ -363,6 +370,7 @@ class App extends React.Component {
     }
     markListForDeletion = (keyPair) => {
         this.setState(prevState => ({
+            modalOpen: true,
             currentList: prevState.currentList,
             listKeyPairMarkedForDeletion : keyPair,
             sessionData: prevState.sessionData
@@ -378,13 +386,18 @@ class App extends React.Component {
         modal.classList.add("is-visible");
     }
     // THIS FUNCTION IS FOR HIDING THE MODAL
-    hideDeleteListModal() {
+    hideDeleteListModal = () => {
+        this.setState(prevState => ({
+            modalOpen: false
+        }));
+        console.log(this.state.modalOpen)
         let modal = document.getElementById("delete-list-modal");
         modal.classList.remove("is-visible");
     }
 
     markSongForRemoval = (keyPair) => {
         this.setState(prevState => ({
+            modalOpen: true,
             currentList: prevState.currentList,
             songKeyPairMarkedForRemoval : keyPair,
         }), () => {
@@ -399,15 +412,25 @@ class App extends React.Component {
     showRemoveSongModal() {
         let modal = document.getElementById("remove-song-modal");
         modal.classList.add("is-visible");
+        console.log(this)
     }
     // THIS FUNCTION IS FOR HIDING THE MODAL
-    hideRemoveSongModal() {
-        let modal = document.getElementById("remove-song-modal");
-        modal.classList.remove("is-visible");
+    hideRemoveSongModal = () => {
+        this.setState(prevState => ({
+            modalOpen: false
+        }), () => {
+            let modal = document.getElementById("remove-song-modal");
+            modal.classList.remove("is-visible");
+        });
+        // console.log(this)
+        // this.setState(prevState => ({
+        //     modalOpen: false
+        // }));
     }
 
     markSongForEdit = (keyPair) => {
         this.setState(prevState => ({
+            modalOpen: true,
             currentList: prevState.currentList,
             songKeyPairMarkedForRemoval : keyPair,
         }), () => {
@@ -423,21 +446,41 @@ class App extends React.Component {
         modal.classList.add("is-visible");
     }
     // THIS FUNCTION IS FOR HIDING THE MODAL
-    hideEditSongModal() {
+    hideEditSongModal = () =>{
         let modal = document.getElementById("edit-song-modal");
         modal.classList.remove("is-visible");
+
+        // console.log(this)
+        this.setState(prevState => ({
+            modalOpen: false
+        }));
+        // console.log(this.state.modalOpen)
     }
 
+    handleKeyDown = event => {
+        if (event.ctrlKey && event.key === 'z') {
+            this.undo();
+        }
+        if (event.ctrlKey && event.key === 'y') {
+            this.redo();
+        }
+    };
+
     render() {
-        let canAddSong = this.state.currentList !== null;
+        let canAddList = this.state.currentList === null; 
+        let canAddSong = this.state.currentList !== null; //if true, current list is open and song can be added
         let canUndo = this.tps.hasTransactionToUndo();
         let canRedo = this.tps.hasTransactionToRedo();
         let canClose = this.state.currentList !== null;
+        console.log("modalOpen:" + this.state.modalOpen)
+
         return (
-            <div id="root-inner">
+            <div id="root-inner" tabIndex={-1} onKeyDown={this.handleKeyDown}>
                 <Banner />
                 <SidebarHeading
                     createNewListCallback={this.createNewList}
+                    canAddList={canAddList}
+                    modalOpen={this.state.modalOpen}
                 />
                 <SidebarList
                     currentList={this.state.currentList}
@@ -447,6 +490,7 @@ class App extends React.Component {
                     renameListCallback={this.renameList}
                 />
                 <EditToolbar
+                    modalOpen={this.state.modalOpen}
                     canAddSong={canAddSong}
                     canUndo={canUndo}
                     canRedo={canRedo}
